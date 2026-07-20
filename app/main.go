@@ -10,7 +10,9 @@ var _ = fmt.Print
 func main() {
 	var command string
 
-	fmt.Print("$ ")
-	fmt.Scanf("%s", &command)
-	fmt.Printf("%s: command not found", command)
+	for {
+		fmt.Print("$ ")
+		fmt.Scanf("%s", &command)
+		fmt.Printf("%s: command not found\n", command)
+	}
 }
