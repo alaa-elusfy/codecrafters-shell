@@ -9,7 +9,7 @@ import (
 var _ = fmt.Print
 
 func exit() {
-	os.Exit(-1)
+	os.Exit(0)
 }
 
 func main() {
