@@ -26,6 +26,16 @@ func main() {
 		} else if strings.HasPrefix(command, "echo") {
 			_, args, _ := strings.Cut(command, " ")
 			fmt.Println(args)
+		} else if strings.HasPrefix(command, "type") {
+			_, cmd, _ := strings.Cut(command, " ")
+
+			switch cmd {
+			case "echo", "exit", "type":
+				fmt.Printf("%s is a shell builtin\n", cmd)
+			default:
+				fmt.Printf("%s: not found\n", cmd)
+			}
+
 		} else {
 			fmt.Printf("%s: command not found\n", command)
 		}
