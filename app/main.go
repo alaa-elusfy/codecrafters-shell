@@ -58,8 +58,6 @@ func checkType(command string) {
 				cmdExist = true
 				fmt.Printf("%s is %s\n", cmd, cmdPath)
 				break
-			} else {
-				continue
 			}
 		}
 
