@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"slices"
 	"strings"
 )
 
@@ -27,17 +28,43 @@ func main() {
 			_, args, _ := strings.Cut(command, " ")
 			fmt.Println(args)
 		} else if strings.HasPrefix(command, "type") {
-			_, cmd, _ := strings.Cut(command, " ")
-
-			switch cmd {
-			case "echo", "exit", "type":
-				fmt.Printf("%s is a shell builtin\n", cmd)
-			default:
-				fmt.Printf("%s: not found\n", cmd)
-			}
-
+			checkType(command)
 		} else {
 			fmt.Printf("%s: command not found\n", command)
+		}
+	}
+}
+
+func checkType(command string) {
+	_, cmd, _ := strings.Cut(command, " ")
+	builtins := []string{"echo", "exit", "type"}
+
+	if slices.Contains(builtins, cmd) {
+		fmt.Printf("%s is a shell builtin\n", cmd)
+	} else {
+		envPath := os.Getenv("PATH")
+		paths := strings.Split(envPath, string(os.PathListSeparator))
+
+		cmdExist := false
+		for _, path := range paths {
+			cmdPath := path + string(os.PathSeparator) + cmd
+
+			fileInfo, err := os.Stat(cmdPath)
+			if err != nil {
+				continue
+			}
+
+			if fileInfo.Mode().Perm()&0111 != 0 {
+				cmdExist = true
+				fmt.Printf("%s is %s\n", cmd, cmdPath)
+				break
+			} else {
+				continue
+			}
+		}
+
+		if !cmdExist {
+			fmt.Printf("%s: not found\n", cmd)
 		}
 	}
 }
