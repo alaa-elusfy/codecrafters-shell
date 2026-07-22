@@ -3,7 +3,9 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"os"
+	"os/exec"
 	"slices"
 	"strings"
 )
@@ -30,7 +32,20 @@ func main() {
 		} else if strings.HasPrefix(command, "type") {
 			checkType(command)
 		} else {
-			fmt.Printf("%s: command not found\n", command)
+			args := strings.Fields(command)
+			if exist, _ := checkCmdInPath(args[0]); exist {
+				execCmd := exec.Command(args[0], args[1:]...)
+				out, err := execCmd.CombinedOutput()
+				if err != nil {
+					log.Print("Error executing command:", err)
+				}
+
+				fmt.Print(string(out))
+
+			} else {
+				fmt.Printf("%s: command not found\n", command)
+			}
+
 		}
 	}
 }
@@ -42,27 +57,31 @@ func checkType(command string) {
 	if slices.Contains(builtins, cmd) {
 		fmt.Printf("%s is a shell builtin\n", cmd)
 	} else {
-		envPath := os.Getenv("PATH")
-		paths := strings.Split(envPath, string(os.PathListSeparator))
 
-		cmdExist := false
-		for _, path := range paths {
-			cmdPath := path + string(os.PathSeparator) + cmd
-
-			fileInfo, err := os.Stat(cmdPath)
-			if err != nil {
-				continue
-			}
-
-			if fileInfo.Mode().Perm()&0111 != 0 {
-				cmdExist = true
-				fmt.Printf("%s is %s\n", cmd, cmdPath)
-				break
-			}
-		}
-
-		if !cmdExist {
+		if exist, path := checkCmdInPath(cmd); !exist {
 			fmt.Printf("%s: not found\n", cmd)
+		} else {
+			fmt.Print(path)
 		}
 	}
+}
+
+func checkCmdInPath(cmd string) (bool, string) {
+	envPath := os.Getenv("PATH")
+	paths := strings.Split(envPath, string(os.PathListSeparator))
+
+	for _, path := range paths {
+		cmdPath := path + string(os.PathSeparator) + cmd
+
+		fileInfo, err := os.Stat(cmdPath)
+		if err != nil {
+			continue
+		}
+
+		if fileInfo.Mode().Perm()&0111 != 0 {
+			return true, fmt.Sprintf("%s is %s\n", cmd, cmdPath)
+		}
+	}
+
+	return false, ""
 }
