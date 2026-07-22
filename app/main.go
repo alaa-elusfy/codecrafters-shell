@@ -26,6 +26,13 @@ func main() {
 		command = strings.TrimSpace(command)
 		if command == "exit" {
 			break
+		} else if command == "pwd" {
+			pwd, err := os.Getwd()
+			if err != nil {
+				log.Print("Can't Get Working Directory", err)
+			}
+			fmt.Println(pwd)
+
 		} else if strings.HasPrefix(command, "echo") {
 			_, args, _ := strings.Cut(command, " ")
 			fmt.Println(args)
