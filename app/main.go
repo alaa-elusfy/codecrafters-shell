@@ -59,7 +59,7 @@ func main() {
 
 func checkType(command string) {
 	_, cmd, _ := strings.Cut(command, " ")
-	builtins := []string{"echo", "exit", "type"}
+	builtins := []string{"echo", "exit", "type", "pwd"}
 
 	if slices.Contains(builtins, cmd) {
 		fmt.Printf("%s is a shell builtin\n", cmd)
