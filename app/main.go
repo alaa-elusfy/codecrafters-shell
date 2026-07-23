@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -36,10 +35,8 @@ func main() {
 
 		} else if strings.HasPrefix(command, "cd") {
 			_, targetDir, _ := strings.Cut(command, " ")
-			if _, err := os.Stat(targetDir); errors.Is(err, os.ErrNotExist) {
+			if err := os.Chdir(targetDir); err != nil {
 				fmt.Printf("cd: %s: No such file or directory\n", targetDir)
-			} else {
-				os.Chdir(targetDir)
 			}
 		} else if strings.HasPrefix(command, "echo") {
 			_, args, _ := strings.Cut(command, " ")
